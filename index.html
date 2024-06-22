@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hangman Game</title>
+    <style>
+       body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    margin-top: 50px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    max-width: 400px;
+    margin: auto;
+}
+
+h1 {
+    margin-bottom: 20px;
+    color: #343a40;
+}
+
+input[type="text"] {
+    padding: 10px;
+    margin-right: 10px;
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+}
+
+button {
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    background-color: #007bff;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+#clue {
+    font-size: 16px;
+    color: #6c757d;
+    margin-bottom: 10px;
+}
+
+#word-display {
+    font-size: 24px;
+    margin: 20px 0;
+}
+
+#attempts-left {
+    font-size: 16px;
+    color: #6c757d;
+    margin-bottom: 10px;
+}
+
+#message {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 20px;
+    color: #dc3545;
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Let's play Hangman!</h1>
+        <p id="clue"></p>
+        <div id="word-display"></div>
+        <p id="attempts-left"></p>
+        <input type="text" id="guess-input" placeholder="Enter a letter">
+        <button onclick="guessLetter()">Guess</button>
+        <p id="message"></p>
+    </div>
+
+    <script>
+        let selectedWord;
+        let displayArray;
+        let attemptsLeft;
+
+        function choice(ch) {
+            let words = [];
+            let clues = [];
+            switch (ch) {
+                case 1:
+                    words = ["lion", "elephant", "tiger", "giraffe", "zebra", "monkey", "hippopotamus", "crocodile", "rhinoceros", "penguin"];
+                    clues = ["King of the jungle", "Has a trunk", "Striped big cat", "Tallest mammal", "Striped horse", "Swings from trees", "Large river mammal", "Large reptile", "Large horned mammal", "Flightless bird"];
+                    break;
+                case 2:
+                    words = ["ferrari", "lamborghini", "mercedes", "bmw", "audi", "porsche", "tesla", "bugatti", "ford", "chevrolet"];
+                    clues = ["Italian sports car", "Italian sports car", "Luxury German brand", "Luxury German brand", "German luxury carmaker", "German sports car", "Electric car company", "French supercar", "American automotive giant", "American automotive brand"];
+                    break;
+                case 3:
+                    words = ["batsman", "bowler", "wicketkeeper", "umpire", "stumps", "googly", "sixer", "century", "boundary", "testmatch"];
+                    clues = ["Player who bats", "Player who bowls", "Player who keeps wicket", "Official in the match", "Wooden sticks", "Trick ball", "Maximum score in a shot", "Hundred runs", "Scoring line", "Long format of the game"];
+                    break;
+                case 4:
+                    words = ["apple", "banana", "orange", "mango", "strawberry", "kiwi", "pineapple", "grape", "watermelon", "papaya"];
+                    clues = ["Red fruit", "Yellow fruit", "Citrus fruit", "Tropical fruit", "Small red fruit", "Small green fruit", "Tropical fruit", "Small round fruit", "Large green fruit", "Tropical fruit"];
+                    break;
+                case 5:
+                    words = ["java", "python", "programming", "cloud", "blockchain", "internet", "bigdata", "data", "cybersecurity", "backend"];
+                    clues = ["Object-oriented programming language", "High-level programming language", "Process of writing code", "Internet storage", "Digital ledger technology", "Global network", "Large-scale data analysis", "Information", "Protection of digital assets", "Server-side technology"];
+                    break;
+                default:
+                    alert("Invalid choice!");
+                    return;
+            }
+            const randomIndex = Math.floor(Math.random() * words.length);
+            selectedWord = words[randomIndex];
+            displayArray = Array(selectedWord.length).fill('_');
+            attemptsLeft = 5;
+            document.getElementById('word-display').innerText = displayArray.join(' ');
+            document.getElementById('attempts-left').innerText = `Attempts left: ${attemptsLeft}`;
+            document.getElementById('clue').innerText = `Clue: ${clues[randomIndex]}`;
+            document.getElementById('message').innerText = '';
+        }
+
+        function guessLetter() {
+            const guessInput = document.getElementById('guess-input').value.toLowerCase();
+            document.getElementById('guess-input').value = '';
+
+            if (!guessInput.match(/[a-z]/)) {
+                alert('Please enter a valid letter.');
+                return;
+            }
+
+            if (displayArray.includes(guessInput)) {
+                document.getElementById('message').innerText = 'Oops! Letter already guessed.';
+                return;
+            }
+
+            let isCorrectGuess = false;
+            for (let i = 0; i < selectedWord.length; i++) {
+                if (guessInput === selectedWord[i]) {
+                    displayArray[i] = guessInput;
+                    isCorrectGuess = true;
+                }
+            }
+
+            if (!isCorrectGuess) {
+                attemptsLeft--;
+                document.getElementById('message').innerText = 'Wrong guess! Try again.';
+            }
+
+            document.getElementById('word-display').innerText = displayArray.join(' ');
+            document.getElementById('attempts-left').innerText = `Attempts left: ${attemptsLeft}`;
+
+            if (!displayArray.includes('_')) {
+                document.getElementById('message').innerText = 'Congratulations! You guessed the word.';
+            }
+
+            if (attemptsLeft === 0) {
+                document.getElementById('message').innerText = `Sorry, you ran out of attempts. The word was: ${selectedWord}`;
+            }
+        }
+        
+        // Call choice function to start the game
+        choice(parseInt(prompt("Choose a topic: \n1. Animals\n2. Cars\n3. Cricket\n4. Fruits\n5. Technology")));
+    </script>
+</body>
+</html>
